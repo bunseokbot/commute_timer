@@ -29,26 +29,71 @@
                 }
             } else {
                 // working day
-                if(date.getHours() >= 19 || date.getHours() < 9) {
+                if(date.getHours() >= 19 || date.getHours() < 10) {
                     // off work - view tomorrow working day
                     if(date.getDay() + 1 > 5) {
                         // if tomorrow is saturday?
                         $('#status').html("내일은 쉬는날입니다. 걱정마세요.");
                     } else {
                         // else
-                        $('#status').html("내일 일나가야지");
+                        var sDay = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 19, 00, 00); // start day
+                        sDay.setDate(sDay.getDate() + 1);
+
+                        var gap = Math.round((sDay - date) / 1000);
+
+                        var sHour = Math.floor(gap / 3600 % 3600);
+                        var sMinute = Math.floor((gap - sHour * 3600) / 60 % 60);
+                        var sSecond = Math.floor((gap - sMinute * 60) % 60);
+
+                        $('#status').html("내일 일나가야지<br>내일 출근시간까지 " + sHour + "시간 " + sMinute + "분 " + sSecond + "초 남았습니다.");
+                        set_title(sHour, sMinute, sSecond);
+
+
+                        if(eHour === 0 && eMinute === 0 && eSecond === 0) {
+                            notify_alert("출근시간 알리미", "출근시간 입니다. 일하세요!!");
+                        } else if(eMinute === 0 && eSecond === 0) {
+                            notify_alert("출근시간 알리미", "출근시간 까지 " + eHour + "시간 남았습니다.");
+                        }
+
                     }
-                } else if(date.getHours() >= 9 || date.getHours() < 19) {
+                } else if(date.getHours() >= 10 || date.getHours() < 19) {
                     // on work - view today working day
-                    var eDay = new Date(date.getFullYear(), date.getMonth() + 1, date.getDate(), 19, 00, 00); // end day
-                    eHour = (eDay - date) / 1000 / 60 / 60 / 24 / 60;
-                    eMinute = (eDay - date) / 1000 / 60 / 60 / 24 / 60 / 60;
-                    eSecond = (eDay - date) / 1000 / 1000 / 60 / 60 / 24 / 60 / 60;
+                    var eDay = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 19, 00, 00); // end day
+                    var gap = Math.round((eDay - date) / 1000);
+
+                    // calculate hour, minute, second
+                    var eHour = Math.floor(gap / 3600 % 3600);
+                    var eMinute = Math.floor((gap - eHour * 3600) / 60 % 60);
+                    var eSecond = Math.floor((gap - eMinute * 60) % 60);
                     $('#status').html("퇴근시간 " + eHour + "시간 " + eMinute + "분 " + eSecond + "초 남았습니다.");
+                    set_title(eHour, eMinute, eSecond);
+
+                    if(eHour === 0 && eMinute === 0 && eSecond === 0) {
+                        notify_alert("퇴근시간 알리미", "퇴근시간 입니다. 퇴근하세요!!");
+                    } else if(eMinute === 0 && eSecond === 0) {
+                        notify_alert("퇴근시간 알리미", "퇴근시간 까지 " + eHour + "시간 남았습니다.");
+                    }
+
                 }
             }
 
         }
+
+        function set_title(hour, minute, second) {
+            $('title').html(hour + ":" + minute + ":" + second);
+        }
+
+        function notify_alert(title, msg) {
+            if(Notification.permission !== "granted") {
+                Notification.requestPermission();
+            } else {
+                var notification = new Notification(title, {
+                    icon: "https://uproot.im/img/favicon.png",
+                    body: msg
+                });
+            }
+        }
+
     </script>
     <style type="text/css">
         #timer, #status {
