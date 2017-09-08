@@ -31,13 +31,15 @@
                 // working day
                 if(date.getHours() >= 19 || date.getHours() < 10) {
                     // off work - view tomorrow working day
-                    if(date.getDay() + 1 > 5) {
+                    if(date.getDay() + 1 > 5 && date.getHours() >= 19) {
                         // if tomorrow is saturday?
                         $('#status').html("내일은 쉬는날입니다. 걱정마세요.");
                     } else {
                         // else
-                        var sDay = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 19, 00, 00); // start day
-                        sDay.setDate(sDay.getDate() + 1);
+                        var sDay = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 10, 00, 00); // start day
+                        if(date.getHours() >= 19 && date.getHours() <= 23) {
+                            sDay.setDate(sDay.getDate() + 1);
+                        }
 
                         var gap = Math.round((sDay - date) / 1000);
 
