@@ -19,9 +19,9 @@
             var date = new Date();
             $('#timer').html(get_now(date));
 
-            if(date.getDay() > 5) {
+            if(date.getDay() > 5 || date.getDay() === 0) {
                 // not work
-                if(date.getDay() == 7 && date.getHours() > 21) {
+                if(date.getDay() === 0 && date.getHours() > 21) {
                     // if sunday and over 9 pm
                     $('#status').html("내일은 월요일입니다. 출근에 대비하세요.");
                 } else {
